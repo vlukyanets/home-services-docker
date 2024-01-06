@@ -1,0 +1,30 @@
+version: '3.9'
+
+services:
+  master:
+    image: buildbot/buildbot-master:v3.10.1
+    container_name: buildbot-master
+    env_file:
+      - master.env
+      - master-worker-creds.env
+    volumes:
+      - buildbot-master-data:/buildbot
+      - ./master:/master-files:ro
+    ports:
+      - "8010:8010"
+    cpus: '0.5'
+    mem_limit: '256m'
+    command: ["dumb-init", "/master-files/start_buildbot.sh"]
+
+  worker:
+    image: buildbot/buildbot-worker:v3.10.1
+    container_name: buildbot-main-worker
+    env_file:
+      - worker.env
+      - master-worker-creds.env
+    cpus: '1'
+    mem_limit: '512m'
+
+volumes:
+  buildbot-master-data:
+    name: buildbot-master-data
